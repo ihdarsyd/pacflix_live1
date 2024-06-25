@@ -87,4 +87,69 @@ class User:
             print(tabulate(table_data,header))
         else:
             raise Exception("Data plan tidak ada")
+        
+
+    def upgrade_plan(self, new_plan):
+        """
+        Fungsi untuk melakukan upgrade ke new_plan
+
+        input: 
+        - new_plan: str
+        return: - 
+        """
+        try:
+            idx_current_plan = self.header_benefit.index(self.current_plan)
+            idx_new_plan = self.header_benefit.index(new_plan)
+
+            if(idx_current_plan < idx_new_plan):
+                # Do upgrade
+                if(self.duration_plan > 12):
+                    #mendapatkan diskon 0.05
+                    total = self.table_benefit[-1][idx_new_plan] - (0.05*self.table_benefit[-1][idx_new_plan])
+
+                else:
+                    total = self.table_benefit[-1][idx_new_plan] 
+                
+                # update informasi current_plan
+                self.current_plan = new_plan
+                for key,value in self.data.items():
+                    if value[0] == self.username:
+                        self.data[key][1] = new_plan
+                        break
+
+                print(f"Harga yang harus dibayarkan untuk upgrade ke {new_plan} adalah Rp.{total}")         
             
+            elif(idx_current_plan == idx_new_plan):
+                print(f"Anda sedang berlangganan plan {self.current_plan}, jadi tidak bisa upgrade")
+
+            else:
+                print("Anda tidak bisa melakukan downgrade")
+        except Exception as e:
+            print(str(e))
+
+    def subscribe_plan(self,plan,kode_referal):
+        """
+        Fungsi subscribe plan untuk user baru
+        input:
+        - plan:str
+        - kode_referal:str
+        """
+        self.curent_plan = plan
+        self.kode_referal = f"{self.username.lower()}-123"
+        self.duration_plan = 1
+
+        list_referal = [row[-1] for row in self.data.values()]
+        idx_plan = self.header_benefit.index(plan)
+        if(kode_referal in list_referal):
+            #mendapatkan diskon
+            total = self.table_benefit[-1][idx_plan] - (0.04*self.table_benefit[-1][idx_plan])
+        else:
+            total = self.table_benefit[-1][idx_plan]
+
+        last_key = max(self.data.keys())
+        self.data[last_key+1] = [self.username, self.curent_plan, self.duration_plan, self.kode_referal]
+
+        print(f"Harga yang harus dibayarkan dari {plan} adalah Rp.{total}")
+
+
+
